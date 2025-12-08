@@ -1,2 +1,7 @@
-dvc
+tensorflow
+mlflow
 dagshub
+dvc
+pandas
+numpy
+matplotlib
