@@ -2,6 +2,10 @@ import tensorflow as tf
 from tensorflow import keras
 from src.config import IMAGE_SIZE, CLASSES
 
+
+
+
+
 def build_model():
     """
     Builds a VGG16 model adapted for Emotion Recognition.
