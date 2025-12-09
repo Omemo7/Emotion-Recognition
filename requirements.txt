@@ -5,3 +5,5 @@ dvc
 pandas
 numpy
 matplotlib
+seaborn
+scikit-learn
