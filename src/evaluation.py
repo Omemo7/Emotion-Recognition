@@ -21,20 +21,20 @@ from sklearn.metrics import (
     precision_score,
     recall_score
 )
-dagshub.init(repo_name="Emotion-Recognition", repo_owner="Omemo7", mlflow=True)
-mlflow.set_tracking_uri(os.environ.get("MLFLOW_TRACKING_URI"))
+#dagshub.init(repo_name="Emotion-Recognition", repo_owner="Omemo7", mlflow=True)
+#mlflow.set_tracking_uri(os.environ.get("MLFLOW_TRACKING_URI"))
 # ==========================
 # LOAD MODEL
 # ==========================
-MODEL_PATH = "models/vgg16_emotion_final3.h5"
-model = tf.keras.models.load_model(MODEL_PATH)
+#MODEL_PATH = "models/vgg16_emotion_final3.h5"
+#model = tf.keras.models.load_model(MODEL_PATH)
 
-print(f"Loaded model from: {MODEL_PATH}")
+#print(f"Loaded model from: {MODEL_PATH}")
 
 # ==========================
 # LOAD TEST DATA
 # ==========================
-test_ds = get_test_dataset()  # <-- your existing function
+#test_ds = get_test_dataset()  # <-- your existing function
 
 
 # ==========================
