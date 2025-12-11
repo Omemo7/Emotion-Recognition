@@ -26,7 +26,7 @@ mlflow.set_tracking_uri(os.environ.get("MLFLOW_TRACKING_URI"))
 # ==========================
 # LOAD MODEL
 # ==========================
-MODEL_PATH = "models/vgg16_emotion_final.h5"
+MODEL_PATH = "models/vgg16_emotion_final3.h5"
 model = tf.keras.models.load_model(MODEL_PATH)
 
 print(f"Loaded model from: {MODEL_PATH}")
@@ -182,5 +182,5 @@ def evaluate_and_log_model(model_path, test_ds, class_names, run_name="evaluate_
 # ==========================
 # RUN EVALUATION
 # ==========================
-acc, f1, p, r, cm = evaluate_and_log_model(MODEL_PATH, test_ds, CLASSES)
+#evaluate_and_log_model(MODEL_PATH, test_ds, CLASSES)
 

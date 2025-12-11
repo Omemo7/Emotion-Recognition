@@ -2,6 +2,7 @@ import os
 import sys
 from pathlib import Path
 
+from evaluation import collect_predictions
 # Add project root to Python path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
@@ -12,6 +13,21 @@ import mlflow
 from src.data_loader import get_datasets, get_test_dataset
 from src.model import build_model
 from src.config import EPOCHS, LEARNING_RATE, BATCH_SIZE, MODELS_DIR,NUM_CLASSES
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import tensorflow as tf
+import sys
+import mlflow
+from pathlib import Path
+import dagshub
+import os
+from src.data_loader import get_test_dataset
+from src.config import CLASSES
+from sklearn.metrics import (
+    confusion_matrix,
+    classification_report,
+)
 
 
 
@@ -135,22 +151,60 @@ def train():
             epochs=EPOCHS,
             callbacks=[MLflowLogger(), early_stop] # <-- Connects the logger here
         )
-        is_test_split = True #Todo: remove this after splitting the test set
-        #temporary until splitting the test set
-        if is_test_split:
-            test_ds = get_test_dataset()
-            
-            # Evaluate the trained model on the test set
-            print("Starting Final Test Evaluation...")
-            test_results = model.evaluate(test_ds, verbose=0)
-            # order: [loss, accuracy, f1]
-            test_loss, test_accuracy, test_f1 = test_results
+       
+        test_ds = get_test_dataset()
+        
+        # Evaluate the trained model on the test set
+        print("Starting Final Test Evaluation...")
+        test_results = model.evaluate(test_ds, verbose=0)
+        # order: [loss, accuracy, f1]
+        test_loss, test_accuracy, test_f1 = test_results
 
-            mlflow.log_metric("final_test_loss", test_loss)
-            mlflow.log_metric("final_test_accuracy", test_accuracy)
-            mlflow.log_metric("final_test_f1", test_f1)
+        mlflow.log_metric("final_test_loss", test_loss)
+        mlflow.log_metric("final_test_accuracy", test_accuracy)
+        mlflow.log_metric("final_test_f1", test_f1)
 
-            print(f"Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.4f}, Test F1: {test_f1:.4f}")
+        print(f"Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.4f}, Test F1: {test_f1:.4f}")
+        y_true, y_pred = collect_predictions(model, test_ds)
+            # ===== Classification report =====
+        report_str = classification_report(y_true, y_pred, target_names=CLASSES)
+        print("\n===== CLASS REPORT =====")
+        print(report_str)
+
+        # Save report as text artifact
+        report_path = "last_run_eval/classification_report.txt"
+        with open(report_path, "w") as f:
+            f.write(report_str)
+        mlflow.log_artifact(report_path)
+
+        
+
+        # ===== Confusion Matrix =====
+        cm = confusion_matrix(y_true, y_pred)
+
+        fig, ax = plt.subplots(figsize=(8, 6))
+        sns.heatmap(
+            cm,
+            annot=True,
+            fmt="d",
+            cmap="Blues",
+            xticklabels=CLASSES,
+            yticklabels=CLASSES,
+            ax=ax
+        )
+        ax.set_xlabel("Predicted")
+        ax.set_ylabel("Actual")
+        ax.set_title("Confusion Matrix")
+        plt.tight_layout()
+
+        cm_path = "last_run_eval/confusion_matrix.png"
+        fig.savefig(cm_path)
+        plt.close(fig)
+
+        # Log confusion matrix image
+        mlflow.log_artifact(cm_path)
+
+        print("\nEvaluation logged to MLflow.")
 
         # 3. Save Model Locally
         if not os.path.exists(MODELS_DIR):

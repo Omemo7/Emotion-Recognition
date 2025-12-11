@@ -37,13 +37,13 @@ def get_datasets():
 
 
 
-def get_test_dataset():
+def get_test_dataset(dir=TEST_DIR):
     """
     Loads the final, held-out test dataset without splitting or shuffling.
     """
     # Load the test data (100% of the files in TEST_DIR)
     test_ds = tf.keras.utils.image_dataset_from_directory(
-        TEST_DIR,
+        dir,
         shuffle=False, # Critical: Do not shuffle the test set
         image_size=IMAGE_SIZE,
         batch_size=BATCH_SIZE,
