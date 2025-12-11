@@ -6,7 +6,6 @@ from keras import regularizers
 
 
 
-
 def build_model():
     """
     Builds a VGG16 model adapted for Emotion Recognition.
@@ -31,11 +30,11 @@ def build_model():
         # Data Augmentation (Optional but recommended)
         keras.layers.RandomFlip("horizontal", input_shape=input_shape),
         keras.layers.RandomRotation(0.1),
-        keras.layers.Lambda(keras.applications.vgg16.preprocess_input),
+        keras.layers.Rescaling(1./255), # VGG expects pixels 0-1 or normalized
         
         base_model,
         
-        keras.layers.GlobalAveragePooling2D(),
+        keras.layers.Flatten(),
         keras.layers.Dense(256, activation='relu',kernel_regularizer=regularizers.l2(0.001)),
         keras.layers.Dropout(0.5), # Reduces overfitting
         keras.layers.Dense(num_classes, activation='softmax') # Final output

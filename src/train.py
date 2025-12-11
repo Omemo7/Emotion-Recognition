@@ -2,6 +2,8 @@ import os
 import sys
 from pathlib import Path
 
+from keras.config import set_max_steps_per_epoch
+
 from evaluation import collect_predictions
 # Add project root to Python path
 project_root = Path(__file__).parent.parent
@@ -143,12 +145,13 @@ def train():
     with mlflow.start_run():
         # 1. Log Params (Manually)
         mlflow.log_params(params)
-        
+        STEPS_PER_EPOCH = 25 #196 happy(majority) * .8 the train only count = 157 then * 5 = 785 then divide by batch /32 = 25 steps
         # 2. Train (with our custom callback)
         history = model.fit(
             train_ds,
             validation_data=val_ds,
             epochs=EPOCHS,
+            steps_per_epoch=STEPS_PER_EPOCH,
             callbacks=[MLflowLogger(), early_stop] # <-- Connects the logger here
         )
        
